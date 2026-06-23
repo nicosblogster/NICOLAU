@@ -15,6 +15,25 @@ class PropertyData:
 
 
 @dataclass
+class PersonalReference:
+    name: str
+    phone: str
+
+
+@dataclass
+class OwnedProperty:
+    address: str
+    iptu_registration: str
+
+
+@dataclass
+class VehicleData:
+    vehicle_type: str
+    model_year: str
+    plate: str
+
+
+@dataclass
 class ApplicantData:
     full_name: str
     birth_date: date
@@ -50,9 +69,11 @@ class ApplicantData:
     extra_income: str
     other_residents: str
     pets: str
-    properties: str
-    vehicles: str
-    references: str
+    has_properties: bool
+    properties: list[OwnedProperty]
+    has_vehicles: bool
+    vehicles: list[VehicleData]
+    references: list[PersonalReference]
 
 
 @dataclass

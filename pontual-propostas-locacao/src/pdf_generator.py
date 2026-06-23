@@ -80,6 +80,37 @@ def _table(rows: list[tuple[str, str]]) -> Table:
     return table
 
 
+def _format_personal_references(applicant) -> str:
+    if not applicant.references:
+        return "Nao informado"
+    return "\n".join(
+        f"{index}. Nome: {reference.name or 'Nao informado'} | Telefone: {reference.phone or 'Nao informado'}"
+        for index, reference in enumerate(applicant.references, start=1)
+    )
+
+
+def _format_owned_properties(applicant) -> str:
+    if not applicant.has_properties:
+        return "Nao possui"
+    if not applicant.properties:
+        return "Nao informado"
+    return "\n".join(
+        f"{index}. Endereco: {property_item.address or 'Nao informado'} | IPTU: {property_item.iptu_registration or 'Nao informado'}"
+        for index, property_item in enumerate(applicant.properties, start=1)
+    )
+
+
+def _format_vehicles(applicant) -> str:
+    if not applicant.has_vehicles:
+        return "Nao possui"
+    if not applicant.vehicles:
+        return "Nao informado"
+    return "\n".join(
+        f"{index}. Tipo: {vehicle.vehicle_type or 'Nao informado'} | Modelo/Ano: {vehicle.model_year or 'Nao informado'} | Placa: {vehicle.plate or 'Nao informado'}"
+        for index, vehicle in enumerate(applicant.vehicles, start=1)
+    )
+
+
 def generate_pdf(submission: ProposalSubmission) -> Path:
     ensure_directories()
     styles = _styles()
@@ -175,9 +206,11 @@ def generate_pdf(submission: ProposalSubmission) -> Path:
             [
                 ("Demais moradores", applicant.other_residents),
                 ("Animais de estimacao", applicant.pets),
-                ("Imoveis proprios", applicant.properties),
-                ("Veiculos", applicant.vehicles),
-                ("Referencias pessoais", applicant.references),
+                ("Possui imovel", "Sim" if applicant.has_properties else "Nao"),
+                ("Imoveis proprios", _format_owned_properties(applicant)),
+                ("Possui veiculo", "Sim" if applicant.has_vehicles else "Nao"),
+                ("Veiculos", _format_vehicles(applicant)),
+                ("Referencias pessoais", _format_personal_references(applicant)),
             ]
         ),
     ]

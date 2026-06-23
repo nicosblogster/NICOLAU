@@ -5,7 +5,16 @@ from urllib.parse import quote
 
 import streamlit as st
 
-from src.models import ApplicantData, DeliveryData, GuarantorData, PropertyData, ProposalSubmission
+from src.models import (
+    ApplicantData,
+    DeliveryData,
+    GuarantorData,
+    OwnedProperty,
+    PersonalReference,
+    PropertyData,
+    ProposalSubmission,
+    VehicleData,
+)
 from src.pdf_generator import generate_pdf
 from src.storage import (
     create_submission_package,
@@ -60,6 +69,8 @@ def init_state() -> None:
     st.session_state.setdefault("last_protocol", None)
     st.session_state.setdefault("last_channel", None)
     st.session_state.setdefault("last_destination", None)
+    st.session_state.setdefault("property_count", 1)
+    st.session_state.setdefault("vehicle_count", 1)
 
 
 def render_header() -> None:
@@ -133,6 +144,38 @@ def validate_form(fields: dict[str, object], uploaded_files: dict[str, object]) 
 
     if int(fields["residents_count"]) < 1:
         errors.append("O numero de moradores deve ser pelo menos 1.")
+
+    references = fields["references"]
+    if not isinstance(references, list) or len(references) != 2:
+        errors.append("Informe exatamente 2 referencias pessoais.")
+    else:
+        for index, reference in enumerate(references, start=1):
+            if not required(reference.name):
+                errors.append(f"Informe o nome da referencia pessoal {index}.")
+            if not validate_phone(reference.phone):
+                errors.append(f"Informe um telefone valido para a referencia pessoal {index}.")
+
+    properties = fields["properties"]
+    if fields["has_properties"]:
+        if not isinstance(properties, list) or not properties:
+            errors.append("Adicione pelo menos um imovel proprio.")
+        else:
+            for index, property_item in enumerate(properties, start=1):
+                if not required(property_item.address):
+                    errors.append(f"Informe o endereco do imovel proprio {index}.")
+                if not required(property_item.iptu_registration):
+                    errors.append(f"Informe a inscricao IPTU do imovel proprio {index}.")
+
+    vehicles = fields["vehicles"]
+    if fields["has_vehicles"]:
+        if not isinstance(vehicles, list) or not vehicles:
+            errors.append("Adicione pelo menos um veiculo.")
+        else:
+            for index, vehicle in enumerate(vehicles, start=1):
+                if not required(vehicle.model_year):
+                    errors.append(f"Informe modelo/ano do veiculo {index}.")
+                if not required(vehicle.plate):
+                    errors.append(f"Informe a placa do veiculo {index}.")
 
     if fields["delivery_channel"] == "E-mail" and not validate_email(str(fields["delivery_destination"])):
         errors.append("Informe um e-mail valido para retorno.")
@@ -290,18 +333,83 @@ def render_form() -> None:
         with st.expander("Moradores, patrimônio e referências"):
             other_residents = st.text_area("Nome e idade dos demais moradores", height=80)
             pets = st.text_area("Possui animais de estimação? Informe tipo e porte", height=70)
-            properties = st.text_area(
-                "Imóveis próprios: endereço e informação sobre escritura definitiva",
-                height=80,
-            )
-            vehicles = st.text_area(
-                "Veículos: tipo, marca/modelo, ano, Renavam e placa",
-                height=80,
-            )
-            references = st.text_area(
-                "Referências pessoais: nome, telefone e ramal (até 3 pessoas)",
-                height=90,
-            )
+            st.markdown("**Referências pessoais**")
+            references: list[PersonalReference] = []
+            for index in range(1, 3):
+                col1, col2 = st.columns([2, 1])
+                with col1:
+                    reference_name = st.text_input(
+                        f"Nome da referência pessoal {index} *",
+                        key=f"reference_name_{index}",
+                    )
+                with col2:
+                    reference_phone = st.text_input(
+                        f"Telefone da referência pessoal {index} *",
+                        placeholder="(21) 99999-9999",
+                        key=f"reference_phone_{index}",
+                    )
+                references.append(PersonalReference(name=reference_name, phone=reference_phone))
+
+            st.markdown("**Imóveis próprios**")
+            has_properties_choice = st.radio("Possui imóvel?", ["Não", "Sim"], horizontal=True, key="has_properties_choice")
+            has_properties = has_properties_choice == "Sim"
+            properties: list[OwnedProperty] = []
+            add_property = False
+            if has_properties:
+                add_property = st.form_submit_button("Adicionar imóvel")
+                for index in range(1, int(st.session_state["property_count"]) + 1):
+                    with st.container(border=True):
+                        st.caption(f"Imóvel {index}")
+                        property_address_input = st.text_area(
+                            f"Endereço do imóvel próprio {index} *",
+                            height=70,
+                            key=f"owned_property_address_{index}",
+                        )
+                        property_iptu_input = st.text_input(
+                            f"Inscrição IPTU do imóvel próprio {index} *",
+                            key=f"owned_property_iptu_{index}",
+                        )
+                    properties.append(
+                        OwnedProperty(
+                            address=property_address_input,
+                            iptu_registration=property_iptu_input,
+                        )
+                    )
+
+            st.markdown("**Veículos**")
+            has_vehicles_choice = st.radio("Possui veículo?", ["Não", "Sim"], horizontal=True, key="has_vehicles_choice")
+            has_vehicles = has_vehicles_choice == "Sim"
+            vehicles: list[VehicleData] = []
+            add_vehicle = False
+            if has_vehicles:
+                add_vehicle = st.form_submit_button("Adicionar veículo")
+                for index in range(1, int(st.session_state["vehicle_count"]) + 1):
+                    with st.container(border=True):
+                        st.caption(f"Veículo {index}")
+                        col1, col2, col3 = st.columns([1, 2, 1])
+                        with col1:
+                            vehicle_type = st.selectbox(
+                                f"Tipo {index} *",
+                                ["Carro", "Moto"],
+                                key=f"vehicle_type_{index}",
+                            )
+                        with col2:
+                            vehicle_model_year = st.text_input(
+                                f"Modelo / Ano {index} *",
+                                key=f"vehicle_model_year_{index}",
+                            )
+                        with col3:
+                            vehicle_plate = st.text_input(
+                                f"Placa {index} *",
+                                key=f"vehicle_plate_{index}",
+                            )
+                    vehicles.append(
+                        VehicleData(
+                            vehicle_type=vehicle_type,
+                            model_year=vehicle_model_year,
+                            plate=vehicle_plate,
+                        )
+                    )
 
         if has_guarantor:
             st.subheader("3. Dados do fiador")
@@ -443,6 +551,14 @@ def render_form() -> None:
         )
         submitted = st.form_submit_button("Gerar proposta em PDF", use_container_width=True)
 
+    if add_property:
+        st.session_state["property_count"] = int(st.session_state["property_count"]) + 1
+        st.rerun()
+
+    if add_vehicle:
+        st.session_state["vehicle_count"] = int(st.session_state["vehicle_count"]) + 1
+        st.rerun()
+
     if not submitted:
         return
 
@@ -486,7 +602,9 @@ def render_form() -> None:
         "extra_income": extra_income,
         "other_residents": other_residents,
         "pets": pets,
+        "has_properties": has_properties,
         "properties": properties,
+        "has_vehicles": has_vehicles,
         "vehicles": vehicles,
         "references": references,
         "has_guarantor": has_guarantor,
@@ -597,7 +715,9 @@ def render_form() -> None:
             extra_income=extra_income,
             other_residents=other_residents,
             pets=pets,
+            has_properties=has_properties,
             properties=properties,
+            has_vehicles=has_vehicles,
             vehicles=vehicles,
             references=references,
         ),

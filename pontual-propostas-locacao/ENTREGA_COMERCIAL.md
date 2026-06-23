@@ -15,6 +15,9 @@ Administradoras, imobiliarias e proprietarios costumam receber dados incompletos
 - Campos baseados no questionario original.
 - Endereco do imovel e aluguel inicialmente em branco.
 - Dados familiares, historico residencial, vinculo profissional, renda, patrimonio e referencias.
+- Duas referencias pessoais obrigatorias, com nome e telefone.
+- Cadastro estruturado de imoveis proprios: opcao Sim/Nao e botao para adicionar mais de um imovel.
+- Cadastro estruturado de veiculos: opcao Sim/Nao e botao para adicionar mais de um veiculo.
 - Cadastro condicional de fiador.
 - Validacao de CPF, telefone, e-mail e data de nascimento.
 - Upload de documentos obrigatorios.

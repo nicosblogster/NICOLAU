@@ -1,0 +1,42 @@
+COMO TESTAR O PONTUAL PROPOSTAS
+===============================
+
+1. Extraia o arquivo ZIP.
+
+2. Abra a pasta extraida.
+
+3. Clique duas vezes em:
+
+   CLIQUE_AQUI_PARA_INICIAR.bat
+
+4. Aguarde alguns minutos na primeira execucao.
+
+5. O sistema vai abrir no navegador.
+
+6. Preencha o formulario.
+
+7. Escolha uma das opcoes:
+
+   Residencial, Comercial ou Temporada
+
+8. Informe 2 referencias pessoais com nome e telefone.
+
+9. Se possuir imovel, marque SIM e use "Adicionar imóvel" para cadastrar outro.
+
+10. Se possuir veiculo, marque SIM e use "Adicionar veículo" para cadastrar outro.
+
+11. Para testar os anexos, use os arquivos da pasta:
+
+   arquivos_teste
+
+12. Clique em:
+
+   Gerar proposta em PDF
+
+13. Baixe o PDF gerado.
+
+OBSERVACAO
+----------
+Se o computador nao tiver Python instalado, o sistema vai abrir a pagina de download.
+Instale o Python marcando a opcao "Add python.exe to PATH" e depois clique novamente
+em CLIQUE_AQUI_PARA_INICIAR.bat.

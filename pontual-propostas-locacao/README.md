@@ -9,6 +9,9 @@ Aplicacao profissional em Streamlit para substituir um Google Forms de proposta 
 - Endereco do imovel e valor do aluguel preenchidos pelo usuario, sem valores predefinidos.
 - Validacao de CPF, e-mail, telefone, data de nascimento e campos obrigatorios.
 - Dados pessoais, familiares, residenciais, profissionais, renda, patrimonio e referencias.
+- Cadastro estruturado de 2 referencias pessoais, com nome e telefone.
+- Campo "Possui imovel?" com inclusao de um ou mais imoveis, contendo endereco e inscricao IPTU.
+- Campo "Possui veiculo?" com inclusao de um ou mais veiculos, contendo tipo, modelo/ano e placa.
 - Cadastro opcional de fiador com documentos proprios.
 - Upload de documento de identidade/CPF, comprovante de residencia e comprovante de renda/IRPF.
 - Geracao automatica de protocolo.
@@ -106,10 +109,13 @@ Ou execute:
 1. Abra a aplicacao no navegador.
 2. Preencha todos os campos obrigatorios.
 3. Use um CPF valido para passar na validacao.
-4. Anexe tres arquivos em PDF, PNG, JPG ou JPEG com ate 10 MB cada.
-5. Marque a declaracao final.
-6. Clique em `Gerar proposta em PDF`.
-7. Baixe o PDF gerado e confira os arquivos salvos em:
+4. Informe as 2 referencias pessoais obrigatorias.
+5. Se possuir imovel, marque `Sim` e use `Adicionar imóvel` para cadastrar mais de um.
+6. Se possuir veiculo, marque `Sim` e use `Adicionar veículo` para cadastrar mais de um.
+7. Anexe tres arquivos em PDF, PNG, JPG ou JPEG com ate 10 MB cada.
+8. Marque a declaracao final.
+9. Clique em `Gerar proposta em PDF`.
+10. Baixe o PDF gerado e confira os arquivos salvos em:
    - `data/submissions/`
    - `data/uploads/`
    - `output/`
