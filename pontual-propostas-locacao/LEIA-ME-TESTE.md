@@ -52,8 +52,18 @@ Se o navegador nao abrir automaticamente, copie esse endereco e cole no navegado
 10. Informe se prefere retorno por WhatsApp ou e-mail.
 11. Marque a declaracao final.
 12. Clique em `Gerar proposta em PDF`.
-13. Baixe o PDF ou o pacote ZIP completo.
+13. Baixe o PDF, o contrato modelo em Word ou o pacote ZIP completo.
 14. Use o botao de WhatsApp/e-mail e anexe o ZIP baixado.
+
+## Modelo Superlogica
+
+O pacote tambem contem:
+
+```text
+templates/contrato_locacao_superlogica.docx
+```
+
+Esse arquivo usa variaveis no formato `%variavel%`, conforme o material enviado sobre o sistema Superlogica. Antes de uso oficial, revise campos sem variavel direta, como garantia, prazo por extenso e representante do proprietario.
 
 ## Onde os arquivos ficam salvos
 

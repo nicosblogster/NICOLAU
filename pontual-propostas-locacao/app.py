@@ -5,8 +5,10 @@ from urllib.parse import quote
 
 import streamlit as st
 
+from src.contract_generator import generate_contract_docx
 from src.models import (
     ApplicantData,
+    ContractData,
     DeliveryData,
     GuarantorData,
     OwnedProperty,
@@ -65,6 +67,7 @@ CUSTOM_CSS = """
 def init_state() -> None:
     ensure_directories()
     st.session_state.setdefault("last_pdf_path", None)
+    st.session_state.setdefault("last_contract_path", None)
     st.session_state.setdefault("last_package_path", None)
     st.session_state.setdefault("last_protocol", None)
     st.session_state.setdefault("last_channel", None)
@@ -229,6 +232,39 @@ def render_form() -> None:
             proposed_rent = st.text_input("Valor do aluguel com encargos *", placeholder="R$ 0,00")
         residents_count = st.number_input("Número de futuros moradores *", min_value=1, max_value=20, value=1)
         fees_notes = st.text_area("Observações sobre condomínio, IPTU ou demais taxas", height=80)
+
+        with st.expander("Dados para contrato modelo", expanded=False):
+            generate_contract = st.checkbox(
+                "Gerar contrato modelo em Word junto com a proposta",
+                value=True,
+                help="O contrato sai em DOCX para revisão final antes de assinatura.",
+            )
+            landlord_details = st.text_area(
+                "Dados completos da locadora / proprietário",
+                placeholder="Nome, nacionalidade, estado civil, profissão, RG, CPF, endereço e representante, se houver.",
+                height=100,
+            )
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                lease_term = st.text_input("Prazo de locação", placeholder="30 (trinta) meses")
+            with col2:
+                contract_start_date = st.text_input("Início do contrato", placeholder="09 de junho de 2026")
+            with col3:
+                contract_end_date = st.text_input("Término do contrato", placeholder="09 de dezembro de 2028")
+            guarantee_clause = st.text_area(
+                "Cláusula de garantia locatícia",
+                placeholder="Descreva fiador, caução, seguro fiança, título de capitalização ou deixe para preencher depois.",
+                height=90,
+            )
+            col1, col2 = st.columns(2)
+            with col1:
+                signature_location_date = st.text_input(
+                    "Local e data de assinatura",
+                    placeholder="Rio de Janeiro, 09 de junho de 2026.",
+                )
+            with col2:
+                landlord_signature_name = st.text_input("Nome da locadora na assinatura")
+            landlord_representative_name = st.text_input("Nome do representante da locadora, se houver")
 
         st.subheader("2. Dados do proponente")
         with st.expander("Dados pessoais", expanded=True):
@@ -568,6 +604,15 @@ def render_form() -> None:
         "proposed_rent": proposed_rent,
         "residents_count": residents_count,
         "fees_notes": fees_notes,
+        "generate_contract": generate_contract,
+        "landlord_details": landlord_details,
+        "lease_term": lease_term,
+        "contract_start_date": contract_start_date,
+        "contract_end_date": contract_end_date,
+        "guarantee_clause": guarantee_clause,
+        "signature_location_date": signature_location_date,
+        "landlord_signature_name": landlord_signature_name,
+        "landlord_representative_name": landlord_representative_name,
         "full_name": full_name,
         "birth_date": birth_date,
         "profession": profession,
@@ -721,18 +766,33 @@ def render_form() -> None:
             vehicles=vehicles,
             references=references,
         ),
+        contract_data=ContractData(
+            generate_contract=generate_contract,
+            landlord_details=landlord_details,
+            lease_term=lease_term,
+            start_date=contract_start_date,
+            end_date=contract_end_date,
+            guarantee_clause=guarantee_clause,
+            signature_location_date=signature_location_date,
+            landlord_signature_name=landlord_signature_name,
+            landlord_representative_name=landlord_representative_name,
+        ),
         guarantor_data=guarantor_data,
         delivery_data=DeliveryData(delivery_channel, delivery_destination),
         documents=documents,
     )
     pdf_path = generate_pdf(submission)
     submission.pdf_path = str(pdf_path)
+    if generate_contract:
+        contract_path = generate_contract_docx(submission)
+        submission.contract_path = str(contract_path)
     json_path = save_submission(submission)
     package_path = create_submission_package(submission, json_path)
     submission.package_path = str(package_path)
     save_submission(submission)
 
     st.session_state["last_pdf_path"] = str(pdf_path)
+    st.session_state["last_contract_path"] = str(contract_path) if generate_contract else None
     st.session_state["last_package_path"] = str(package_path)
     st.session_state["last_protocol"] = protocol
     st.session_state["last_channel"] = delivery_channel
@@ -756,6 +816,17 @@ def render_download() -> None:
             mime="application/pdf",
             use_container_width=True,
         )
+
+    contract_path = st.session_state.get("last_contract_path")
+    if contract_path:
+        with open(contract_path, "rb") as file:
+            st.download_button(
+                "Baixar contrato modelo em Word",
+                data=file,
+                file_name=f"{st.session_state.get('last_protocol')}-contrato-modelo.docx",
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                use_container_width=True,
+            )
 
     package_path = st.session_state.get("last_package_path")
     if package_path:

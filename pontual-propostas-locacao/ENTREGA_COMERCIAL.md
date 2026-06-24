@@ -25,6 +25,8 @@ Administradoras, imobiliarias e proprietarios costumam receber dados incompletos
 - Armazenamento local dos dados preenchidos.
 - Organizacao dos documentos por protocolo.
 - Geracao automatica de PDF.
+- Geracao opcional de contrato modelo em Word a partir da proposta.
+- Modelo de contrato separado com variaveis Superlogica para uso/adaptacao no sistema do cliente.
 - Pacote ZIP com PDF, JSON e documentos anexados.
 - Encaminhamento assistido por WhatsApp ou e-mail.
 - Interface visual para demonstracao comercial.
@@ -63,5 +65,9 @@ Administradoras, imobiliarias e proprietarios costumam receber dados incompletos
 - `src/validators.py`: validacoes.
 - `src/storage.py`: salvamento local.
 - `src/pdf_generator.py`: geracao do PDF.
+- `src/contract_generator.py`: geracao do contrato modelo em Word.
+- `templates/contrato_locacao_modelo.docx`: base do contrato preenchido pelo app.
+- `templates/contrato_locacao_superlogica.docx`: base com variaveis Superlogica.
+- `SUPERLOGICA_VARIAVEIS.md`: mapeamento das variaveis Superlogica analisadas.
 - `requirements.txt`: dependencias.
 - `run_windows.bat`: execucao simplificada no Windows.

@@ -17,6 +17,8 @@ Aplicacao profissional em Streamlit para substituir um Google Forms de proposta 
 - Geracao automatica de protocolo.
 - Salvamento local dos dados em JSON.
 - Geracao de PDF profissional para analise da administradora ou proprietario.
+- Geracao opcional de contrato modelo em Word (`.docx`) a partir dos dados da proposta.
+- Modelo de contrato com variaveis Superlogica para adaptacao no sistema do cliente.
 - Geracao de pacote ZIP com proposta e documentos.
 - Atalhos para abrir WhatsApp ou e-mail com mensagem de encaminhamento.
 - Interface pronta para demonstracao comercial.
@@ -30,10 +32,15 @@ locacao-streamlit-pro/
   README.md
   run_windows.bat
   src/
+    contract_generator.py
     models.py
     pdf_generator.py
     storage.py
     validators.py
+  templates/
+    contrato_locacao_modelo.docx
+    contrato_locacao_superlogica.docx
+  SUPERLOGICA_VARIAVEIS.md
   data/
     submissions/
     uploads/
@@ -77,6 +84,9 @@ Arquivos importantes para o solicitante:
 - `LEIA-ME-TESTE.md`: instrucoes simples de teste.
 - `COMO_TESTAR_RAPIDO.txt`: passo a passo minimo para cliente leigo.
 - `ENTREGA_COMERCIAL.md`: resumo comercial do que foi entregue.
+- `SUPERLOGICA_VARIAVEIS.md`: variaveis Superlogica extraidas do material enviado pelo cliente.
+- `templates/contrato_locacao_modelo.docx`: modelo Word usado pelo app para gerar contrato preenchido.
+- `templates/contrato_locacao_superlogica.docx`: modelo Word com variaveis `%...%` para adaptacao no Superlogica.
 - `CLIQUE_AQUI_PARA_INICIAR.bat`: instala dependencias e inicia a aplicacao.
 - `arquivos_teste/`: documentos ficticios para testar os anexos.
 
@@ -115,7 +125,8 @@ Ou execute:
 7. Anexe tres arquivos em PDF, PNG, JPG ou JPEG com ate 10 MB cada.
 8. Marque a declaracao final.
 9. Clique em `Gerar proposta em PDF`.
-10. Baixe o PDF gerado e confira os arquivos salvos em:
+10. Baixe o PDF, o contrato modelo em Word e o pacote ZIP gerado.
+11. Confira os arquivos salvos em:
    - `data/submissions/`
    - `data/uploads/`
    - `output/`

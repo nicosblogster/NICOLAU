@@ -64,6 +64,8 @@ def create_submission_package(submission: ProposalSubmission, json_path: Path) -
     package_path = OUTPUT_DIR / f"{submission.protocol}-documentos.zip"
     with zipfile.ZipFile(package_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.write(submission.pdf_path, arcname=f"{submission.protocol}.pdf")
+        if submission.contract_path and Path(submission.contract_path).exists():
+            archive.write(submission.contract_path, arcname=f"{submission.protocol}-contrato-modelo.docx")
         archive.write(json_path, arcname=f"{submission.protocol}.json")
         for document in submission.documents:
             source = Path(document.saved_path)

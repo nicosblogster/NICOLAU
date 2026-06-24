@@ -109,6 +109,19 @@ class DeliveryData:
 
 
 @dataclass
+class ContractData:
+    generate_contract: bool = True
+    landlord_details: str = ""
+    lease_term: str = ""
+    start_date: str = ""
+    end_date: str = ""
+    guarantee_clause: str = ""
+    signature_location_date: str = ""
+    landlord_signature_name: str = ""
+    landlord_representative_name: str = ""
+
+
+@dataclass
 class UploadedDocument:
     label: str
     filename: str
@@ -121,11 +134,13 @@ class ProposalSubmission:
     property_data: PropertyData
     applicant_data: ApplicantData
     delivery_data: DeliveryData
+    contract_data: ContractData = field(default_factory=ContractData)
     guarantor_data: GuarantorData | None = None
     documents: list[UploadedDocument] = field(default_factory=list)
     protocol: str = ""
     created_at: datetime = field(default_factory=datetime.now)
     pdf_path: str | None = None
+    contract_path: str | None = None
     package_path: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
